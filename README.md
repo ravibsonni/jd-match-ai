@@ -190,3 +190,16 @@ If a URL or file is selected and no pasted JD is present, the app automatically 
 ## Vercel routing
 
 The project uses Vercel's native Next.js + Python layout. `api/index.py` is the FastAPI entry point and exposes `/api/extract`, `/api/analyze`, `/api/health`, and `/api/profile`. No custom `vercel.json` rewrite is required.
+
+
+## API verification
+
+After deployment, test these endpoints in order:
+
+- `GET /api` — confirms Vercel routed the Python function
+- `GET /api/health` — confirms FastAPI is running
+- `GET /api/profile` — confirms the master profile loads
+- `POST /api/extract` — accepts `url`, `file`, or `jd_text`
+- `POST /api/analyze` — accepts JSON `{ "jd_text": "..." }`
+
+If `/api` itself returns 404, check the Vercel Project Root Directory: it must point to the repository root containing both `api/` and `src/`.

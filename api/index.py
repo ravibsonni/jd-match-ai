@@ -18,6 +18,19 @@ PROFILE_PATH = ROOT / "data" / "master_profile.json"
 profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
 
 app = FastAPI(title="JD Matcher V1", version="1.0.0")
+
+@app.get("/api")
+def api_root():
+    return {
+        "status": "ok",
+        "service": "jd-matcher",
+        "endpoints": [
+            "/api/health",
+            "/api/profile",
+            "/api/extract",
+            "/api/analyze"
+        ]
+    }
 origins = [x.strip() for x in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if x.strip()]
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
@@ -130,17 +143,14 @@ Job description:
 
 
 @app.get("/api/health")
-@app.get("/health")
 def health():
     return {"status": "ok", "llm_configured": bool(os.getenv("OPENAI_API_KEY"))}
 
 @app.get("/api/profile")
-@app.get("/profile")
 def get_profile():
     return profile
 
 @app.post("/api/extract")
-@app.post("/extract")
 async def extract(url: Optional[str] = Form(None), file: Optional[UploadFile] = File(None), jd_text: Optional[str] = Form(None)):
     try:
         if jd_text and jd_text.strip():
@@ -163,7 +173,6 @@ async def extract(url: Optional[str] = Form(None), file: Optional[UploadFile] = 
 
 
 @app.post("/api/analyze")
-@app.post("/analyze")
 def analyze(req: AnalyzeRequest):
     jd = clean_text(req.jd_text)
     if len(jd) < 100:
