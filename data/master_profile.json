@@ -1,0 +1,76 @@
+{
+  "candidate": {
+    "name": "Ravi Soni",
+    "target_roles": ["Senior Product Manager", "Technical Product Manager", "Platform Product Manager", "Growth Product Manager", "AI Product Manager"],
+    "experience_years": 14,
+    "product_management_years": "6+",
+    "education": "Bachelor of Engineering (B.E.), Information Technology, RGPV, 2011",
+    "certifications": ["Scrum Product Owner Accredited Certification, 2024", "Scrum Master Accredited Certification, 2020"],
+    "location": "Indore, India",
+    "relocation": true
+  },
+  "capabilities": {
+    "product_strategy": ["Product vision and strategy", "Roadmaps", "PRDs", "GTM strategy", "Prioritization", "Competitive analysis", "North Star metrics", "0-to-1 launches", "Commercialization"],
+    "customer_growth": ["Customer interviews", "Discovery calls", "Customer journey optimization", "Adoption", "Retention", "Churn", "Cross-sell", "Funnel analysis"],
+    "technical_product": ["Enterprise SaaS", "API products", "Developer platforms", "API architecture", "Microservices", "Backend architecture", "Integrations", "Scalable systems", "Queue-based workflows"],
+    "analytics": ["Google Analytics", "FullStory", "Amplitude", "Mixpanel", "Product telemetry", "Before/after analysis", "Churn detection"],
+    "ai": ["Claude Code", "VS Code", "RAG", "CrewAI", "AI/LLM products", "AI agents", "Figma prototyping"],
+    "leadership": ["Engineering", "Sales", "Marketing", "Support", "QA", "Cross-functional leadership", "Agile/Scrum"]
+  },
+  "verified_impact": [
+    "30,000+ clients served across enterprise SaaS",
+    "~80M Campaign API requests per month",
+    "~$540K annual revenue retained through churn intervention",
+    "~9% reduction in customer churn",
+    "~70% support-ticket deflection, approximately 1,400 of 2,000 monthly tickets",
+    "300% increase in OTP Widget conversion funnel from 2 to 8 using comparable ~20 inbound leads",
+    "~200 additional Dotsale clients supported after architecture transformation",
+    "$27K ARR for Dotsale within first year"
+  ],
+  "experience": [
+    {
+      "company": "Walkover Web Solutions",
+      "period": "Aug 2014 – Present",
+      "role": "Senior Product Manager — MSG91 & AI Initiatives",
+      "period_in_role": "May 2020 – Present",
+      "evidence": [
+        "Own product strategy and roadmap for MSG91 core platform and AI initiatives serving 30,000+ clients and a ~$6M ARR business.",
+        "Built an account-health workflow using historical versus current-day messaging volume; account managers review behavior, record outreach reasons and automate outcomes; contributed to ~$540K annual revenue retention and ~9% churn reduction.",
+        "Led product strategy and API architecture for Campaign, an omnichannel communication platform processing ~80M requests/month; unified multiple channel-specific integrations behind one API.",
+        "Led AI Sales Strategist discovery and rapid prototyping to reduce GTM planning from weeks to minutes using Claude Code, VS Code, RAG and CrewAI; designed Figma experience and North Star metric around recovered accounts.",
+        "Reduced support workload ~70% through an automated knowledge-crawling support workflow, deflecting ~1,400 of ~2,000 monthly tickets.",
+        "Used customer, competitive and engineering evidence for roadmap trade-offs, including challenging a founder-proposed Campaign integration plugin and prioritizing analytics.",
+        "Optimized OTP Widget setup using customer interviews, discovery calls and FullStory; default configuration increased conversions from 2 to 8 from comparable ~20 inbound leads, a 300% increase."
+      ]
+    },
+    {
+      "company": "Walkover Web Solutions",
+      "period": "Aug 2014 – Present",
+      "role": "Founding Product Manager — Dotsale (Restaurant & Retail SaaS)",
+      "period_in_role": "Apr 2017 – Mar 2020",
+      "evidence": [
+        "Led product strategy for a restaurant digitization platform integrating POS, inventory management and kitchen fulfillment.",
+        "Built a recommendation engine that monitored raw-material expiry and recommended targeted promotions for dishes using ingredients approaching expiry, helping address raw-material waste.",
+        "Owned six-month roadmap, GTM strategy, PRDs and North Star metrics.",
+        "Led architecture transformation from tightly coupled application to independently deployable frontend, backend and queue-management services, enabling faster releases and independent scaling.",
+        "Supported onboarding of ~200 additional clients after the initial 100-client launch phase.",
+        "Built and orchestrated a 15-person cross-functional team across Sales, Support, Engineering and QA."
+      ]
+    },
+    {
+      "company": "Walkover Web Solutions",
+      "period": "Aug 2014 – Mar 2017",
+      "role": "Software Engineer — Backend API & Angular Developer",
+      "evidence": ["Engineered backend APIs for the Giddh accounting platform and built a Windows mobile VoIP calling application."]
+    },
+    {
+      "company": "Aripra Infotech",
+      "period": "Aug 2012 – Aug 2014",
+      "role": "Windows Desktop Developer",
+      "evidence": ["Developed and optimized Windows desktop applications for core infrastructure."]
+    }
+  ],
+  "tools": ["Jira", "Confluence", "Productboard", "Figma", "Amplitude", "Mixpanel", "Google Analytics", "FullStory", "Miro", "Claude Code", "VS Code", "RAG", "CrewAI", "Angular"],
+  "domain_experience": ["Enterprise SaaS", "CPaaS", "Restaurant technology", "Retail SaaS", "POS", "Inventory management", "Kitchen fulfillment", "Customer lifecycle", "AI/LLM"],
+  "known_gaps_not_to_invent": ["Formal CRM transformation", "Identity resolution", "Salesforce/HubSpot/Dynamics ownership", "Automotive domain", "Delivery fleet/last-mile logistics", "GCC operating experience", "Formal A/B testing unless separately verified"]
+}
