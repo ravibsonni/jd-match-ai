@@ -12,9 +12,10 @@ export type EvidenceItem = {
 export type RequirementMapping = {
   requirement: string;
   category: string;
-  priority: "high" | "medium" | "low";
-  classification: "direct" | "transferable" | "gap" | "unknown";
+  priority: "critical" | "required" | "important" | "preferred" | "bonus" | "high" | "medium" | "low";
+  classification: "DIRECT" | "TRANSFERABLE" | "GAP" | "UNKNOWN" | "direct" | "transferable" | "gap" | "unknown";
   match_score: number;
+  evidence_confidence: number;
   candidate_evidence: EvidenceItem[];
   reason: string;
   resume_action: string;
@@ -47,6 +48,11 @@ export type InterviewRisk = {
 export type Analysis = {
   job: { title: string; company: string; location: string };
   overall_score: number;
+  score_label: string;
+  evidence_confidence: number;
+  apply_recommendation: "STRONG_APPLY" | "APPLY" | "SELECTIVE_APPLY" | "STRETCH" | "LOW_PRIORITY";
+  why_apply: string[];
+  why_not: string[];
   score_breakdown: ScoreBreakdown[];
   summary: string;
   strong_matches: Array<{ requirement: string; evidence: string; score: number; metric?: string; why_it_matters?: string }>;
@@ -55,7 +61,9 @@ export type Analysis = {
   interview_risks: InterviewRisk[];
   tailoring_strategy: string[];
   requirement_mapping: RequirementMapping[];
+  requirement_evidence: RequirementMapping[];
   resume_changes: ResumeChange[];
+  selected_impact: string[];
   keywords: { high_priority: string[]; secondary: string[] };
   claims_to_avoid: string[];
   tailored_resume: string;
@@ -361,6 +369,19 @@ Ravi Soni`;
   return {
     job: { title: "", company: "", location: "" },
     overall_score: 80,
+    score_label: "Strong Fit",
+    evidence_confidence: 92,
+    apply_recommendation: "APPLY",
+    why_apply: [
+      "Ravi has direct evidence in product strategy, customer discovery, API architecture, and measurable business impact.",
+      "He has proven retention, conversion, and platform-scale outcomes that map well to product-led roles.",
+      "The profile contains a credible AI/product experimentation story grounded in actual work and tooling."
+    ],
+    why_not: [
+      "No formal CRM transformation ownership is established in the verified profile.",
+      "Logistics, fleet, or GCC-specific operational experience is not evidenced in the current profile.",
+      "Certain domain-specific requirements should be treated as stretch or clearly disclosed in interview."
+    ],
     score_breakdown: [
       { category: "Core Product Experience", score: 90, weight: 20, reason: "Strong product leadership evidence across roadmap, GTM, analytics, and AI-enabled product work." },
       { category: "JD Responsibilities", score: 85, weight: 20, reason: "Direct alignment with strategy, discovery, customer outcomes, and cross-functional execution." },
@@ -387,86 +408,116 @@ Ravi Soni`;
       {
         requirement: "Product strategy and roadmap ownership",
         category: "product_strategy",
-        priority: "high",
-        classification: "direct",
+        priority: "required",
+        classification: "DIRECT",
         match_score: 92,
+        evidence_confidence: 96,
         candidate_evidence: [
           { experience: "MSG91 & AI Initiatives", evidence: "Owned product strategy and roadmap for a platform serving 30,000+ clients and a ~$6M ARR business.", metric: "30,000+ clients", relevance: "Direct match to roadmap and strategic product ownership." },
           { experience: "Dotsale", evidence: "Owned six-month roadmap, GTM strategy, PRDs, and North Star metrics.", metric: "~200 additional clients after architecture transformation", relevance: "Supports product planning and delivery accountability." }
         ],
         reason: "Strong, specific evidence of product planning, prioritization, and business accountability.",
         resume_action: "Lead the summary and Selected Impact with roadmap ownership, GTM, and platform growth outcomes.",
-        interview_relevance: "Good candidate story for strategic planning and decision-making." 
+        interview_relevance: "Good candidate story for strategic planning and decision-making."
       },
       {
         requirement: "Customer acquisition, retention, and lifecycle value",
         category: "customer_growth",
-        priority: "high",
-        classification: "direct",
+        priority: "required",
+        classification: "DIRECT",
         match_score: 90,
+        evidence_confidence: 96,
         candidate_evidence: [
           { experience: "MSG91 account health", evidence: "Built an account-health workflow using historical versus current-day messaging volume to identify declining accounts.", metric: "$540K annual revenue retained; ~9% churn reduction", relevance: "Direct evidence of retention and lifecycle value work." },
           { experience: "OTP Widget", evidence: "Optimized setup to reduce friction and improve conversion from comparable inbound leads.", metric: "300% increase from 2 to 8", relevance: "Supports customer journey and activation optimization." }
         ],
         reason: "Direct evidence across retention, churn analysis, and funnel optimization is present.",
         resume_action: "Frame metrics around revenue retention and conversion lift to reinforce lifecycle value ownership.",
-        interview_relevance: "Strong story for customer behavior and churn intervention." 
+        interview_relevance: "Strong story for customer behavior and churn intervention."
       },
       {
         requirement: "API architecture or technical product management",
         category: "technical_product",
-        priority: "high",
-        classification: "direct",
+        priority: "required",
+        classification: "DIRECT",
         match_score: 92,
+        evidence_confidence: 95,
         candidate_evidence: [
           { experience: "Campaign platform", evidence: "Led product strategy and API architecture for an omnichannel communication platform processing ~80M requests/month.", metric: "~80M requests/month", relevance: "Strong direct API and technical product match." },
           { experience: "Architecture transformation", evidence: "Separated frontend, backend, and queue management services to enable independent deployment and scaling.", metric: "~200 additional clients supported", relevance: "Shows platform and system thinking." }
         ],
         reason: "The profile contains clear evidence of API strategy, integrations, scaling, and engineering collaboration.",
         resume_action: "Develop the resume around API platform work and system design trade-offs.",
-        interview_relevance: "Useful story for technical product conversations and prioritization." 
+        interview_relevance: "Useful story for technical product conversations and prioritization."
       },
       {
         requirement: "AI or GenAI product work",
         category: "ai",
-        priority: "medium",
-        classification: "direct",
+        priority: "important",
+        classification: "DIRECT",
         match_score: 88,
+        evidence_confidence: 90,
         candidate_evidence: [
           { experience: "AI Sales Strategist", evidence: "Built an AI-assisted GTM planning workflow using Claude Code, VS Code, RAG, and CrewAI.", metric: "Reduced GTM planning from weeks to minutes", relevance: "Strong match for AI-native product experimentation." },
           { experience: "Product prototyping", evidence: "Designed a Figma prototype and focused on a North Star metric around recovered accounts.", metric: "North Star metric defined for recovered accounts", relevance: "Supports AI product design and discovery skill." }
         ],
         reason: "This is one of Ravi's strongest differentiators in modern product work.",
         resume_action: "Highlight the AI Sales Strategist work as a visible differentiator without overstating general-purpose AI leadership.",
-        interview_relevance: "Prepare to explain the product, workflow, and measurement model clearly." 
+        interview_relevance: "Prepare to explain the product, workflow, and measurement model clearly."
       },
       {
         requirement: "Supply chain optimization or inventory operations",
         category: "operations",
-        priority: "medium",
-        classification: "transferable",
+        priority: "preferred",
+        classification: "TRANSFERABLE",
         match_score: 72,
+        evidence_confidence: 76,
         candidate_evidence: [
           { experience: "Dotsale restaurant SaaS", evidence: "Built recommendation engine to monitor raw-material expiry and recommend promotions for dishes using those ingredients.", metric: "Reduced raw-material waste", relevance: "Transferable operational optimization experience; not direct supply-chain ownership." },
           { experience: "Restaurant operations", evidence: "Owned POS, inventory management, and kitchen fulfillment workflows in a restaurant product setting.", metric: "Restaurant SaaS operations domain", relevance: "Closely related but not a direct supply-chain or logistics role." }
         ],
         reason: "The work is operationally relevant, but it does not establish direct supply-chain or logistics-scale ownership.",
         resume_action: "Use it as transferable experience and state operational optimization honestly, not as direct fleet or logistics expertise.",
-        interview_relevance: "Be ready to clarify the difference between restaurant operations and logistics-scale ownership." 
+        interview_relevance: "Be ready to clarify the difference between restaurant operations and logistics-scale ownership."
       },
       {
         requirement: "Formal CRM transformation",
         category: "crm",
-        priority: "medium",
-        classification: "gap",
-        match_score: 10,
+        priority: "critical",
+        classification: "GAP",
+        match_score: 0,
+        evidence_confidence: 0,
         candidate_evidence: [],
         reason: "There is no verified profile evidence of Salesforce, HubSpot, Dynamics, or end-to-end CRM transformation ownership.",
         resume_action: "Do not claim CRM transformation ownership. Emphasize lifecycle and retention product work instead.",
-        interview_relevance: "If asked, acknowledge the gap and speak to customer lifecycle and account health work as related but distinct experience." 
+        interview_relevance: "If asked, acknowledge the gap and speak to customer lifecycle and account health work as related but distinct experience."
+      }
+    ],
+    requirement_evidence: [
+      {
+        requirement: "Product strategy and roadmap ownership",
+        category: "product_strategy",
+        priority: "required",
+        classification: "DIRECT",
+        match_score: 92,
+        evidence_confidence: 96,
+        candidate_evidence: [
+          { experience: "MSG91 & AI Initiatives", evidence: "Owned product strategy and roadmap for a platform serving 30,000+ clients and a ~$6M ARR business.", metric: "30,000+ clients", relevance: "Direct match to roadmap and strategic product ownership." },
+          { experience: "Dotsale", evidence: "Owned six-month roadmap, GTM strategy, PRDs, and North Star metrics.", metric: "~200 additional clients after architecture transformation", relevance: "Supports product planning and delivery accountability." }
+        ],
+        reason: "Strong, specific evidence of product planning, prioritization, and business accountability.",
+        resume_action: "Lead the summary and Selected Impact with roadmap ownership, GTM, and platform growth outcomes.",
+        interview_relevance: "Good candidate story for strategic planning and decision-making."
       }
     ],
     resume_changes: resumeChanges,
+    selected_impact: [
+      "300% OTP Widget conversion improvement using customer discovery and FullStory-led onboarding optimization.",
+      "Approximately $540K annual revenue retained through account-health and churn intervention.",
+      "Approximately 9% churn reduction enabled by behavioral monitoring and customer lifecycle workflows.",
+      "API platform strategy serving ~80M requests/month across multiple communication channels.",
+      "AI Sales Strategist reduced GTM planning from weeks to minutes."
+    ],
     keywords: {
       high_priority: highPriority.length ? highPriority : ["product strategy", "customer discovery", "API architecture", "retention", "analytics", "AI", "customer journey", "roadmap"],
       secondary: secondary.length ? secondary : ["cross-functional leadership", "PRD", "GTM", "product analytics", "support automation"]
@@ -481,6 +532,81 @@ Ravi Soni`;
     tailored_resume: tailoredResume,
     cover_letter: coverLetter
   };
+}
+
+function normalizePriority(value: string): RequirementMapping["priority"] {
+  const normalized = value.toLowerCase().trim();
+  if (["critical", "must", "mandatory"].includes(normalized)) return "critical";
+  if (["required", "high"].includes(normalized)) return "required";
+  if (["important", "medium", "moderate"].includes(normalized)) return "important";
+  if (["preferred", "nice to have", "bonus"].includes(normalized)) return "preferred";
+  return "important";
+}
+
+function normalizeClassification(value: string): RequirementMapping["classification"] {
+  const normalized = value.toLowerCase().trim();
+  if (["direct", "strong"].includes(normalized)) return "DIRECT";
+  if (["transferable", "related"].includes(normalized)) return "TRANSFERABLE";
+  if (["gap", "missing"].includes(normalized)) return "GAP";
+  if (["unknown", "unclear"].includes(normalized)) return "UNKNOWN";
+  return "UNKNOWN";
+}
+
+function scoreLabel(score: number): string {
+  if (score >= 90) return "Excellent Fit";
+  if (score >= 75) return "Strong Fit";
+  if (score >= 60) return "Good Fit";
+  if (score >= 45) return "Selective Fit";
+  return "Stretch / Gap";
+}
+
+function recommendationForScore(score: number, gaps: Array<{ risk?: string }>): Analysis["apply_recommendation"] {
+  const highRisk = gaps.filter((gap) => String(gap?.risk ?? "").toLowerCase() === "high").length;
+  if (score >= 85 && highRisk === 0) return "STRONG_APPLY";
+  if (score >= 70) return "APPLY";
+  if (score >= 55) return "SELECTIVE_APPLY";
+  if (score >= 40) return "STRETCH";
+  return "LOW_PRIORITY";
+}
+
+function finalizeAnalysis(analysis: Analysis): Analysis {
+  const safe = { ...analysis };
+  safe.overall_score = Math.min(100, Math.max(0, Number(analysis.overall_score ?? 0)));
+  safe.evidence_confidence = Math.min(100, Math.max(0, Number(analysis.evidence_confidence ?? 80)));
+  safe.score_label = scoreLabel(safe.overall_score);
+  safe.apply_recommendation = recommendationForScore(safe.overall_score, analysis.gaps ?? []);
+  safe.why_apply = Array.isArray(analysis.why_apply) && analysis.why_apply.length ? analysis.why_apply.map(String) : ["Strong alignment exists between the candidate profile and the JD."];
+  safe.why_not = Array.isArray(analysis.why_not) && analysis.why_not.length ? analysis.why_not.map(String) : ["No major gaps are apparent in the candidate profile."];
+  safe.requirement_mapping = Array.isArray(analysis.requirement_mapping) ? analysis.requirement_mapping.map((entry) => ({
+    ...entry,
+    priority: normalizePriority(String(entry?.priority ?? "important")),
+    classification: normalizeClassification(String(entry?.classification ?? "UNKNOWN")),
+    match_score: Math.min(100, Math.max(0, Number(entry?.match_score ?? 0))),
+    evidence_confidence: Math.min(100, Math.max(0, Number(entry?.evidence_confidence ?? 80))),
+    candidate_evidence: Array.isArray(entry?.candidate_evidence) ? entry.candidate_evidence.map((item) => ({
+      experience: String(item?.experience ?? "Experience"),
+      evidence: String(item?.evidence ?? "Evidence"),
+      metric: String(item?.metric ?? ""),
+      relevance: String(item?.relevance ?? "Relevant to the requirement.")
+    })) : []
+  })) : [];
+  safe.requirement_evidence = Array.isArray(analysis.requirement_evidence) && analysis.requirement_evidence.length
+    ? analysis.requirement_evidence.map((entry) => ({
+        ...entry,
+        priority: normalizePriority(String(entry?.priority ?? "important")),
+        classification: normalizeClassification(String(entry?.classification ?? "UNKNOWN")),
+        match_score: Math.min(100, Math.max(0, Number(entry?.match_score ?? 0))),
+        evidence_confidence: Math.min(100, Math.max(0, Number(entry?.evidence_confidence ?? 80))),
+        candidate_evidence: Array.isArray(entry?.candidate_evidence) ? entry.candidate_evidence.map((item) => ({
+          experience: String(item?.experience ?? "Experience"),
+          evidence: String(item?.evidence ?? "Evidence"),
+          metric: String(item?.metric ?? ""),
+          relevance: String(item?.relevance ?? "Relevant to the requirement.")
+        })) : []
+      }))
+    : safe.requirement_mapping;
+  safe.selected_impact = Array.isArray(analysis.selected_impact) && analysis.selected_impact.length ? analysis.selected_impact.map(String) : ["Candidate impact is captured in the scored evidence and summary."];
+  return safe;
 }
 
 function parseJsonObject(raw: string | null | undefined): Record<string, any> | null {
@@ -531,9 +657,10 @@ function normalizeAnalysis(raw: Record<string, any> | null | undefined, jd: stri
   const requirement_mapping = Array.isArray(raw.requirement_mapping) ? raw.requirement_mapping.map((item: any) => ({
     requirement: String(item?.requirement ?? "Requirement"),
     category: String(item?.category ?? "general"),
-    priority: item?.priority === "high" || item?.priority === "medium" || item?.priority === "low" ? item.priority : "medium",
-    classification: item?.classification === "direct" || item?.classification === "transferable" || item?.classification === "gap" || item?.classification === "unknown" ? item.classification : "unknown",
+    priority: normalizePriority(String(item?.priority ?? "important")),
+    classification: normalizeClassification(String(item?.classification ?? "UNKNOWN")),
     match_score: Number(item?.match_score ?? 0),
+    evidence_confidence: Math.min(100, Math.max(0, Number(item?.evidence_confidence ?? 80))),
     candidate_evidence: Array.isArray(item?.candidate_evidence) ? item.candidate_evidence.map((e: any) => ({
       experience: String(e?.experience ?? "Experience"),
       evidence: String(e?.evidence ?? "Evidence"),
@@ -556,13 +683,18 @@ function normalizeAnalysis(raw: Record<string, any> | null | undefined, jd: stri
     secondary: Array.isArray(raw.keywords.secondary) ? raw.keywords.secondary.map(String) : fallback.keywords.secondary
   } : fallback.keywords;
 
-  return {
+  const baseAnalysis: Analysis = {
     job: {
       title: String(job?.title ?? ""),
       company: String(job?.company ?? ""),
       location: String(job?.location ?? "")
     },
     overall_score,
+    score_label: scoreLabel(overall_score),
+    evidence_confidence: 0,
+    apply_recommendation: recommendationForScore(overall_score, gaps),
+    why_apply: Array.isArray(raw.why_apply) ? raw.why_apply.map(String) : fallback.why_apply,
+    why_not: Array.isArray(raw.why_not) ? raw.why_not.map(String) : fallback.why_not,
     score_breakdown: Array.isArray(raw.score_breakdown) ? raw.score_breakdown.map((item: any) => ({
       category: String(item?.category ?? "General"),
       score: Number(item?.score ?? 0),
@@ -576,12 +708,32 @@ function normalizeAnalysis(raw: Record<string, any> | null | undefined, jd: stri
     interview_risks,
     tailoring_strategy,
     requirement_mapping,
+    requirement_evidence: Array.isArray(raw.requirement_evidence) ? raw.requirement_evidence.map((item: any) => ({
+      requirement: String(item?.requirement ?? "Requirement"),
+      category: String(item?.category ?? "general"),
+      priority: normalizePriority(String(item?.priority ?? "important")),
+      classification: normalizeClassification(String(item?.classification ?? "UNKNOWN")),
+      match_score: Number(item?.match_score ?? 0),
+      evidence_confidence: Math.min(100, Math.max(0, Number(item?.evidence_confidence ?? 80))),
+      candidate_evidence: Array.isArray(item?.candidate_evidence) ? item.candidate_evidence.map((e: any) => ({
+        experience: String(e?.experience ?? "Experience"),
+        evidence: String(e?.evidence ?? "Evidence"),
+        metric: String(e?.metric ?? ""),
+        relevance: String(e?.relevance ?? "Relevant to this requirement.")
+      })) : [],
+      reason: String(item?.reason ?? "Reasoning available."),
+      resume_action: String(item?.resume_action ?? "Emphasize relevant evidence."),
+      interview_relevance: String(item?.interview_relevance ?? "Relevant to interview preparation.")
+    })) : requirement_mapping,
     resume_changes,
+    selected_impact: Array.isArray(raw.selected_impact) ? raw.selected_impact.map(String) : fallback.selected_impact,
     keywords,
     claims_to_avoid: Array.isArray(raw.claims_to_avoid) ? raw.claims_to_avoid.map(String) : fallback.claims_to_avoid,
     tailored_resume: typeof raw.tailored_resume === "string" && raw.tailored_resume.trim() ? raw.tailored_resume : fallback.tailored_resume,
     cover_letter: typeof raw.cover_letter === "string" && raw.cover_letter.trim() ? raw.cover_letter : fallback.cover_letter,
   };
+
+  return finalizeAnalysis(baseAnalysis);
 }
 
 function resolveOpenAIModelName(): string {
@@ -661,7 +813,7 @@ ${jd}`;
       }
 
       const normalized = normalizeAnalysis(parsed, jd);
-      return normalized;
+      return finalizeAnalysis(normalized);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       const isModelError = /404|does not exist|not access|not available|401|403|model/i.test(message);

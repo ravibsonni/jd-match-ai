@@ -56,6 +56,11 @@ type RequirementMapping = {
 type Analysis = {
   job: { title: string; company: string; location: string };
   overall_score: number;
+  score_label: string;
+  evidence_confidence: number;
+  apply_recommendation: "STRONG_APPLY" | "APPLY" | "SELECTIVE_APPLY" | "STRETCH" | "LOW_PRIORITY";
+  why_apply: string[];
+  why_not: string[];
   score_breakdown: Array<{ category: string; score: number; weight: number; reason: string }>;
   summary: string;
   strong_matches: StrongMatch[];
@@ -64,7 +69,9 @@ type Analysis = {
   interview_risks: InterviewRisk[];
   tailoring_strategy: string[];
   requirement_mapping: RequirementMapping[];
+  requirement_evidence: RequirementMapping[];
   resume_changes: ResumeChange[];
+  selected_impact: string[];
   keywords: { high_priority: string[]; secondary: string[] };
   claims_to_avoid: string[];
   tailored_resume: string;
@@ -203,12 +210,27 @@ export default function Page() {
               <div>
                 <div className="eyebrow">MATCH SCORE</div>
                 <div className="big">{result.overall_score}%</div>
-                <h2>
-                  {result.job.title || "Role"}
-                  {result.job.company ? ` · ${result.job.company}` : ""}
-                </h2>
+                <h2>{result.score_label}</h2>
                 <p>{result.summary}</p>
+                <div className="meta-grid">
+                  <div><strong>Evidence confidence</strong><br />{result.evidence_confidence}%</div>
+                  <div><strong>Apply recommendation</strong><br />{result.apply_recommendation}</div>
+                </div>
               </div>
+            </div>
+
+            <div className="card">
+              <h2>Why Ravi should apply</h2>
+              <ul>
+                {result.why_apply.map((item, index) => <li key={index}>{item}</li>)}
+              </ul>
+            </div>
+
+            <div className="card">
+              <h2>Why Ravi may not be a fit</h2>
+              <ul>
+                {result.why_not.map((item, index) => <li key={index}>{item}</li>)}
+              </ul>
             </div>
 
             <div className="card">
