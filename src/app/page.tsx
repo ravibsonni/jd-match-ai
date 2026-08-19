@@ -26,6 +26,9 @@ export default function Page() {
   const [status, setStatus] = useState("");
   const [result, setResult] = useState<Analysis | null>(null);
 
+  const hasSource = Boolean(url.trim() || file || jd.trim());
+
+
   async function loadJD() {
     setLoading(true);
     setStatus("Extracting job description…");
@@ -48,17 +51,40 @@ export default function Page() {
   }
 
   async function analyze() {
-    if (jd.trim().length < 100) {
-      setStatus("Paste or load a job description first.");
-      return;
-    }
     setLoading(true);
-    setStatus("Analyzing fit and generating tailored documents…");
+    setStatus("Preparing job description…");
     try {
+      let analysisJD = jd.trim();
+
+      // If the user selected a URL/file and has not pasted/loaded text yet,
+      // extract it first so Analyze & Tailor works from any of the 3 input modes.
+      if (analysisJD.length < 100 && (url.trim() || file)) {
+        const fd = new FormData();
+        if (url.trim()) fd.append("url", url.trim());
+        if (file) fd.append("file", file);
+
+        const extractResponse = await fetch("/api/extract", {
+          method: "POST",
+          body: fd
+        });
+        const extractData = await extractResponse.json();
+        if (!extractResponse.ok) {
+          throw new Error(extractData.detail || "Could not load the job description");
+        }
+
+        analysisJD = String(extractData.text || "").trim();
+        setJd(analysisJD);
+        setStatus(`Loaded from ${extractData.source}. Analyzing…`);
+      }
+
+      if (analysisJD.length < 100) {
+        throw new Error("Provide a job URL, upload a JD, or paste at least 100 characters of the JD.");
+      }
+
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jd_text: jd })
+        body: JSON.stringify({ jd_text: analysisJD })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Analysis failed");
@@ -88,7 +114,7 @@ export default function Page() {
           <div className="eyebrow">JOB SEARCH COPILOT · V1</div>
           <h1>JD Matcher</h1>
           <p>
-            Paste a JD or public job URL. Compare it against your verified master profile,
+            Paste a JD, upload a file, or enter a public job URL. Compare it against your verified master profile,
             identify gaps, and generate a tailored application.
           </p>
         </header>
@@ -118,7 +144,7 @@ export default function Page() {
             <button onClick={loadJD} disabled={loading}>
               {loading ? "Working…" : "Load JD"}
             </button>
-            <button className="primary" onClick={analyze} disabled={loading || jd.length < 100}>
+            <button className="primary" onClick={analyze} disabled={loading || !hasSource}>
               {loading ? "Analyzing…" : "Analyze & Tailor"}
             </button>
           </div>

@@ -175,3 +175,18 @@ The application is designed to prefer evidence over keyword stuffing. It explici
 - PDF/DOCX resume generation
 - Better JD parsing and structured requirement extraction
 - Interview-question generation from identified gaps
+
+
+## Input modes
+
+The **Analyze & Tailor** button accepts any one of these sources:
+
+1. Job URL — public HTTP/HTTPS URL
+2. Upload JD — PDF, DOCX, TXT, or MD
+3. Paste JD — plain text
+
+If a URL or file is selected and no pasted JD is present, the app automatically extracts the JD before analysis.
+
+## Vercel routing
+
+The project uses Vercel's native Next.js + Python layout. `api/index.py` is the FastAPI entry point and exposes `/api/extract`, `/api/analyze`, `/api/health`, and `/api/profile`. No custom `vercel.json` rewrite is required.
