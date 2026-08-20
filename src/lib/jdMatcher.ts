@@ -486,9 +486,9 @@ Ravi Soni`;
         priority: "critical",
         classification: "GAP",
         match_score: 0,
-        evidence_confidence: 0,
+        evidence_confidence: 95,
         candidate_evidence: [],
-        reason: "There is no verified profile evidence of Salesforce, HubSpot, Dynamics, or end-to-end CRM transformation ownership.",
+        reason: "There is no verified profile evidence of Salesforce, HubSpot, Dynamics, or end-to-end CRM transformation ownership. This is a clear, high-confidence gap: the profile makes it evident the experience is absent, even though the match score is 0.",
         resume_action: "Do not claim CRM transformation ownership. Emphasize lifecycle and retention product work instead.",
         interview_relevance: "If asked, acknowledge the gap and speak to customer lifecycle and account health work as related but distinct experience."
       }
@@ -830,7 +830,19 @@ Important rules:
 - Distinguish direct vs transferable vs gap vs unknown.
 - If a requirement is not supported, classify it as gap or unknown and say so explicitly.
 - Keep score explainable and aligned to evidence.
-- For every requirement, provide evidence_confidence from 0 to 100 representing how strongly the candidate's VERIFIED profile evidence supports the classification and evidence presented. Use these guidelines: DIRECT with strong verified evidence = 90-100; DIRECT with moderate evidence = 75-89; TRANSFERABLE with strong related evidence = 70-89; TRANSFERABLE with moderate evidence = 50-69; UNKNOWN = 0-49; GAP = 0-20. evidence_confidence measures CONFIDENCE IN THE EVIDENCE. It is NOT the same as match_score. Do not use evidence_confidence to make the candidate look better, and do not invent evidence. Do NOT output any overall/aggregate evidence_confidence; the application calculates the overall value from the per-requirement values.
+- For every requirement, return TWO independent values: match_score AND evidence_confidence.
+  * match_score (0-100) = how well Ravi matches the requirement.
+  * evidence_confidence (0-100) = how confident we are that the assessment is supported by Ravi's VERIFIED profile. It measures certainty in the assessment itself, NOT how good the match is.
+- evidence_confidence is INDEPENDENT of match_score and of classification:
+  * DIRECT does NOT automatically mean high confidence.
+  * TRANSFERABLE does NOT automatically mean low confidence.
+  * GAP does NOT automatically mean 0 confidence. A genuine, clearly-evidenced GAP should have HIGH evidence_confidence (90-100) because we can be highly confident the experience is absent from the verified profile.
+- Assign evidence_confidence by how certain the profile makes the assessment, regardless of whether the assessment is a match or a gap:
+  * The profile clearly and unambiguously supports the assessment (strong direct match, OR an experience that is clearly absent) → 90-100.
+  * The profile reasonably supports the assessment with some interpretation (solid transferable evidence, or a likely gap) → 60-89.
+  * The profile is thin, ambiguous, or the requirement is vague so we cannot be sure either way (typically UNKNOWN) → 0-49.
+- Examples: CRM transformation with no supporting profile evidence → match_score = 0, evidence_confidence = 90-100 (we are confident the experience is absent). A weak/ambiguous requirement → match_score may be low, and evidence_confidence should reflect how certain we are about that assessment, not how strong the match is.
+- Do not invent evidence, and do not inflate evidence_confidence to make the candidate look better. Do NOT output any overall/aggregate evidence_confidence; the application calculates the overall value from the per-requirement values.
 - Produce a genuine resume and cover letter tailored to the JD, based on the profile.
 - The resume should be 700-1100 words and ATS-friendly, not generic marketing copy.
 - The cover letter should be 300-450 words and specifically reference JD requirements.
