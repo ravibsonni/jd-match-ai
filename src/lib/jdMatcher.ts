@@ -552,6 +552,47 @@ function normalizeClassification(value: string): RequirementMapping["classificat
   return "UNKNOWN";
 }
 
+// Weights used only for aggregating requirement-level Evidence Confidence.
+// This is intentionally separate from the match-score / score_breakdown weighting.
+function evidenceConfidencePriorityWeight(priority: string): number {
+  switch (normalizePriority(String(priority ?? "important"))) {
+    case "critical":
+      return 1.5;
+    case "required":
+      return 1.25;
+    case "important":
+      return 1.0;
+    case "preferred":
+      return 0.6;
+    default:
+      return 0.3; // bonus / anything lower
+  }
+}
+
+// Deterministic, application-side aggregation of the LLM's per-requirement
+// evidence_confidence values into a single overall Evidence Confidence (0-100).
+function calculateEvidenceConfidence(requirements: RequirementMapping[]): number {
+  if (!Array.isArray(requirements) || !requirements.length) return 0;
+
+  let weightedConfidence = 0;
+  let totalWeight = 0;
+
+  for (const requirement of requirements) {
+    const weight = evidenceConfidencePriorityWeight(requirement?.priority);
+    const confidence = Math.min(100, Math.max(0, Number(requirement?.evidence_confidence ?? 0)));
+
+    if (Number.isNaN(confidence)) continue;
+
+    weightedConfidence += confidence * weight;
+    totalWeight += weight;
+  }
+
+  if (!totalWeight) return 0;
+
+  const result = Math.round(weightedConfidence / totalWeight);
+  return Number.isFinite(result) ? Math.min(100, Math.max(0, result)) : 0;
+}
+
 function scoreLabel(score: number): string {
   if (score >= 90) return "Excellent Fit";
   if (score >= 75) return "Strong Fit";
@@ -572,7 +613,6 @@ function recommendationForScore(score: number, gaps: Array<{ risk?: string }>): 
 function finalizeAnalysis(analysis: Analysis): Analysis {
   const safe = { ...analysis };
   safe.overall_score = Math.min(100, Math.max(0, Number(analysis.overall_score ?? 0)));
-  safe.evidence_confidence = Math.min(100, Math.max(0, Number(analysis.evidence_confidence ?? 80)));
   safe.score_label = scoreLabel(safe.overall_score);
   safe.apply_recommendation = recommendationForScore(safe.overall_score, analysis.gaps ?? []);
   safe.why_apply = Array.isArray(analysis.why_apply) && analysis.why_apply.length ? analysis.why_apply.map(String) : ["Strong alignment exists between the candidate profile and the JD."];
@@ -605,6 +645,10 @@ function finalizeAnalysis(analysis: Analysis): Analysis {
         })) : []
       }))
     : safe.requirement_mapping;
+  // Evidence Confidence is calculated deterministically from the requirement-level
+  // evidence, NOT taken from any top-level LLM value. It measures how confident we
+  // are in the evidence supporting the assessment — it is not the match score.
+  safe.evidence_confidence = calculateEvidenceConfidence(safe.requirement_evidence);
   safe.selected_impact = Array.isArray(analysis.selected_impact) && analysis.selected_impact.length ? analysis.selected_impact.map(String) : ["Candidate impact is captured in the scored evidence and summary."];
   return safe;
 }
@@ -772,7 +816,7 @@ Your output must be a JSON object with this exact structure:
   "gaps": [{"requirement": "", "reason": "", "risk": "high|medium|low", "transferable_experience": "", "discuss_in_interview": true}],
   "interview_risks": [{"risk": "", "likely_question": "", "best_candidate_story": "", "evidence": "", "honest_gap": ""}],
   "tailoring_strategy": [""],
-  "requirement_mapping": [{"requirement": "", "category": "", "priority": "high|medium|low", "classification": "direct|transferable|gap|unknown", "match_score": 0, "candidate_evidence": [{"experience": "", "evidence": "", "metric": "", "relevance": ""}], "reason": "", "resume_action": "", "interview_relevance": ""}],
+  "requirement_mapping": [{"requirement": "", "category": "", "priority": "high|medium|low", "classification": "direct|transferable|gap|unknown", "match_score": 0, "evidence_confidence": 0, "candidate_evidence": [{"experience": "", "evidence": "", "metric": "", "relevance": ""}], "reason": "", "resume_action": "", "interview_relevance": ""}],
   "resume_changes": [{"section": "", "action": "rewrite|prioritize|reorder", "reason": "", "content_direction": "", "experience": ""}],
   "keywords": {"high_priority": [""], "secondary": [""]},
   "claims_to_avoid": [""],
@@ -786,6 +830,7 @@ Important rules:
 - Distinguish direct vs transferable vs gap vs unknown.
 - If a requirement is not supported, classify it as gap or unknown and say so explicitly.
 - Keep score explainable and aligned to evidence.
+- For every requirement, provide evidence_confidence from 0 to 100 representing how strongly the candidate's VERIFIED profile evidence supports the classification and evidence presented. Use these guidelines: DIRECT with strong verified evidence = 90-100; DIRECT with moderate evidence = 75-89; TRANSFERABLE with strong related evidence = 70-89; TRANSFERABLE with moderate evidence = 50-69; UNKNOWN = 0-49; GAP = 0-20. evidence_confidence measures CONFIDENCE IN THE EVIDENCE. It is NOT the same as match_score. Do not use evidence_confidence to make the candidate look better, and do not invent evidence. Do NOT output any overall/aggregate evidence_confidence; the application calculates the overall value from the per-requirement values.
 - Produce a genuine resume and cover letter tailored to the JD, based on the profile.
 - The resume should be 700-1100 words and ATS-friendly, not generic marketing copy.
 - The cover letter should be 300-450 words and specifically reference JD requirements.
